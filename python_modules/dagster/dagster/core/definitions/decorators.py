@@ -308,9 +308,10 @@ def solid(
                   in the dictionary get resolved by the same rules, recursively.
 
         required_resource_keys (Optional[Set[str]]): Set of resource handles required by this solid.
+
         tags (Optional[Dict[str, str]]): Arbitrary metadata for the solid. Frameworks may
             expect and require certain metadata to be attached to a solid. Users should generally
-            not set metadata directly.
+            not set tags directly.
 
     Examples:
 
