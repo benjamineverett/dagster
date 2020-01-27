@@ -1,3 +1,4 @@
+import sys
 import uuid
 
 from dagster_graphql.test.utils import define_context_for_repository_yaml, execute_dagster_graphql
