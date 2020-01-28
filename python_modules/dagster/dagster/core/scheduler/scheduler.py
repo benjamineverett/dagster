@@ -6,6 +6,7 @@ import six
 
 from dagster import check
 from dagster.core.definitions.schedule import ScheduleDefinition, ScheduleDefinitionData
+from dagster.core.instance import DagsterInstance
 from dagster.core.serdes import whitelist_for_serdes
 
 
@@ -57,7 +58,6 @@ def get_schedule_change_set(old_schedules, new_schedule_defs):
 
 class SchedulerHandle(object):
     def __init__(self, scheduler_type, schedule_defs, artifacts_dir, repository_name):
-        from .storage import FilesystemScheduleStorage
 
         check.subclass_param(scheduler_type, 'scheduler_type', Scheduler)
         check.list_param(schedule_defs, 'schedule_defs', ScheduleDefinition)
@@ -69,7 +69,8 @@ class SchedulerHandle(object):
         self._schedule_defs = schedule_defs
         self._repository_name = repository_name
 
-        self._schedule_storage = FilesystemScheduleStorage(base_dir=artifacts_dir)
+        instance = DagsterInstance.get()
+        self._schedule_storage = instance.schedule_storage
 
     def up(self, python_path, repository_path):
         '''SchedulerHandle stores a list of up-to-date ScheduleDefinitions and a reference to a
