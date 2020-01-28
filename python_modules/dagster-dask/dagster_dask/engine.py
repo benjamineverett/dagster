@@ -1,3 +1,5 @@
+import ast
+
 import dask
 import dask.distributed
 from dagster_graphql.client.mutations import execute_execute_plan_mutation
@@ -7,6 +9,7 @@ from dagster.core.engine.engine_base import Engine
 from dagster.core.events import DagsterEvent
 from dagster.core.execution.context.system import SystemPipelineExecutionContext
 from dagster.core.execution.plan.plan import ExecutionPlan
+from dagster.utils import frozentags
 
 from .config import DaskConfig
 
@@ -21,6 +24,15 @@ def query_on_dask_worker(
     scheduling, even though we do not use this argument within the function.
     '''
     return execute_execute_plan_mutation(handle, variables, instance_ref=instance_ref)
+
+
+def get_dask_resource_requirements(tags):
+    check.inst_param(tags, 'tags', frozentags)
+    req_str = tags.get(DASK_RESOURCE_REQUIREMENTS_KEY)
+    if req_str is not None:
+        return ast.literal_eval(req_str)
+
+    return {}
 
 
 class DaskEngine(Engine):  # pylint: disable=no-init
@@ -106,7 +118,7 @@ class DaskEngine(Engine):  # pylint: disable=no-init
                         dependencies,
                         instance.get_ref(),
                         key=dask_task_name,
-                        resources=step.metadata.get(DASK_RESOURCE_REQUIREMENTS_KEY, {}),
+                        resources=get_dask_resource_requirements(step.tags),
                     )
 
                     execution_futures.append(future)

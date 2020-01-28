@@ -72,7 +72,7 @@ def start_celery_worker():
     assert result.exit_code == 0, str(result.exception)
 
 
-@solid(metadata={'dagster-celery/priority': 0})
+@solid(tags={'dagster-celery/priority': '0'})
 def zero(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 0
@@ -80,7 +80,7 @@ def zero(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 1})
+@solid(tags={'dagster-celery/priority': '1'})
 def one(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 1
@@ -88,7 +88,7 @@ def one(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 2})
+@solid(tags={'dagster-celery/priority': '2'})
 def two(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 2
@@ -96,7 +96,7 @@ def two(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 3})
+@solid(tags={'dagster-celery/priority': '3'})
 def three(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 3
@@ -104,7 +104,7 @@ def three(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 4})
+@solid(tags={'dagster-celery/priority': '4'})
 def four(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 4
@@ -112,7 +112,7 @@ def four(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 5})
+@solid(tags={'dagster-celery/priority': '5'})
 def five(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 5
@@ -120,7 +120,7 @@ def five(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 6})
+@solid(tags={'dagster-celery/priority': '6'})
 def six(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 6
@@ -128,7 +128,7 @@ def six(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 7})
+@solid(tags={'dagster-celery/priority': '7'})
 def seven_(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 7
@@ -136,7 +136,7 @@ def seven_(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 8})
+@solid(tags={'dagster-celery/priority': '8'})
 def eight(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 8
@@ -144,7 +144,7 @@ def eight(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 9})
+@solid(tags={'dagster-celery/priority': '9'})
 def nine(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 9
@@ -152,7 +152,7 @@ def nine(context):
     return True
 
 
-@solid(metadata={'dagster-celery/priority': 10})
+@solid(tags={'dagster-celery/priority': '10'})
 def ten(context):
     assert 'dagster-celery/priority' in context.solid.metadata
     assert context.solid.metadata['dagster-celery/priority'] == 10
