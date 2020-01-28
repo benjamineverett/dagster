@@ -131,8 +131,8 @@ def _warn_on_priority_misuse(context, execution_plan):
     for key in execution_plan.step_keys_to_execute:
         step = execution_plan.get_step_by_key(key)
         if (
-            step.metadata.get('dagster/priority') is not None
-            and step.metadata.get('dagster-celery/priority') is None
+            step.tags.get('dagster/priority') is not None
+            and step.tags.get('dagster-celery/priority') is None
         ):
             bad_keys.append(key)
 
