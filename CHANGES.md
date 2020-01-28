@@ -50,6 +50,7 @@
   execution, especially in a multiprocessing or remote execution environment.
 - The `@system_storage` decorator now requires argument `required_resource_keys`, which was
   previously optional.
+- `step_metadata_fn` has been removed from `SolidDefinition` & `@solid`.
 
 **New**
 
