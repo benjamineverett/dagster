@@ -20,9 +20,9 @@ class DagsterType(object):
 
     def __init__(
         self,
-        key,
-        name,
         type_check_fn,
+        key=None,
+        name=None,
         is_builtin=False,
         description=None,
         input_hydration_config=None,
@@ -30,8 +30,25 @@ class DagsterType(object):
         serialization_strategy=None,
         auto_plugins=None,
     ):
-        self.key = check.str_param(key, 'key')
-        self.name = check.opt_str_param(name, 'name')
+        check.opt_str_param(key, 'key')
+        check.opt_str_param(name, 'name')
+
+        check.invariant(not (name is None and key is None), 'Must set key or name')
+
+        if name is None:
+            check.param_invariant(
+                bool(key), 'key', 'If name is not provided, must provide key.',
+            )
+            self.key, self.name = key, name
+        elif key is None:
+            check.param_invariant(
+                bool(name), 'name', 'If key is not provided, must provide name.',
+            )
+            self.key, self.name = name, name
+        else:
+            check.invariant(key and name)
+            self.key, self.name = key, name
+
         self.description = check.opt_str_param(description, 'description')
         self.input_hydration_config = check.opt_inst_param(
             input_hydration_config, 'input_hydration_config', InputHydrationConfig
