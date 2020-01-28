@@ -53,6 +53,7 @@
 - `Field` takes a `is_required` rather than a `is_optional` argument. This is avoid confusion
   with python's typing and dagster's definition of `Optional`, which indicates None-ability,
   rather than existence. `is_optional` is deprecated and will be removed in a future version.
+- `step_metadata_fn` has been removed from `SolidDefinition` & `@solid`.
 
 **New**
 
