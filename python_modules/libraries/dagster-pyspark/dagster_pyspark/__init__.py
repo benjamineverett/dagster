@@ -3,11 +3,21 @@ import os
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame as NativeSparkDataFrame
 
-from dagster import Bool, Field, Materialization, Path, String, as_dagster_type, check, resource
+from dagster import (  # as_dagster_type,
+    Bool,
+    Field,
+    Materialization,
+    Path,
+    String,
+    check,
+    define_python_dagster_type,
+    resource,
+)
 from dagster.config.field_utils import Selector
 from dagster.core.storage.system_storage import fs_system_storage
 from dagster.core.storage.type_storage import TypeStoragePlugin
 from dagster.core.types.config_schema import input_selector_schema, output_selector_schema
+from dagster.core.types.dagster_type import register_python_type
 
 from .decorators import pyspark_solid
 from .resources import PySparkResourceDefinition, pyspark_resource, spark_session_from_config
@@ -57,9 +67,14 @@ def write_rdd(context, file_type, file_options, spark_rdd):
         check.failed('Unsupported file type: {}'.format(file_type))
 
 
-SparkRDD = as_dagster_type(
-    RDD, 'SparkRDD', input_hydration_config=load_rdd, output_materialization_config=write_rdd
+SparkRDD = define_python_dagster_type(
+    python_type=RDD,
+    name='SparkRDD',
+    input_hydration_config=load_rdd,
+    output_materialization_config=write_rdd,
 )
+
+register_python_type(python_type=RDD, runtime_type=SparkRDD)
 
 
 @output_selector_schema(
@@ -124,10 +139,12 @@ class SparkDataFrameFilesystemStoragePlugin(TypeStoragePlugin):  # pylint: disab
         )
 
 
-DataFrame = as_dagster_type(
-    NativeSparkDataFrame,
+DataFrame = define_python_dagster_type(
+    python_type=NativeSparkDataFrame,
     name='PySparkDataFrame',
     description='A Pyspark data frame.',
     auto_plugins=[SparkDataFrameS3StoragePlugin, SparkDataFrameFilesystemStoragePlugin],
     output_materialization_config=spark_df_output_schema,
 )
+
+register_python_type(python_type=NativeSparkDataFrame, runtime_type=DataFrame)

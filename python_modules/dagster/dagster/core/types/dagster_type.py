@@ -362,13 +362,13 @@ class _Nothing(DagsterType):
 
 
 class PythonObjectType(DagsterType):
-    def __init__(self, python_type=None, key=None, name=None, **kwargs):
-        name = check.opt_str_param(name, 'name', type(self).__name__)
+    def __init__(self, python_type, key=None, name=None, **kwargs):
+        self.python_type = check.type_param(python_type, 'python_type')
+        name = check.opt_str_param(name, 'name', python_type.__name__)
         key = check.opt_str_param(key, 'key', name)
         super(PythonObjectType, self).__init__(
             key=key, name=name, type_check_fn=self.type_check_method, **kwargs
         )
-        self.python_type = check.type_param(python_type, 'python_type')
 
     def type_check_method(self, value):
         if not isinstance(value, self.python_type):
