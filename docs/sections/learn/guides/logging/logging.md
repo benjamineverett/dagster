@@ -1,12 +1,12 @@
 # Logging Guide
 
-- [The log guide](#The-log-guide)
-  - [Logging from a solid](#Logging-from-a-solid)
-  - [The built-in loggers](#The-built-in-loggers)
-  - [Debugging with logs](#Debugging-with-logs)
-  - [Configuring the built-in loggers](#Configuring-the-built-in-loggers)
-  - [Modes and logging](#Modes-and-logging)
-  - [Implementing custom loggers](#Implementing-custom-loggers)
+- [Logging Guide](#logging-guide)
+  - [Logging from a solid](#logging-from-a-solid)
+  - [The built-in loggers](#the-built-in-loggers)
+  - [Debugging with logs](#debugging-with-logs)
+  - [Configuring the built-in loggers](#configuring-the-built-in-loggers)
+  - [Modes and logging](#modes-and-logging)
+  - [Implementing custom loggers](#implementing-custom-loggers)
 
 ## Logging from a solid
 
@@ -172,8 +172,8 @@ import logging
 
 @logger(
     {
-        'log_level': Field(str, is_optional=True, default_value='INFO'),
-        'name': Field(str, is_optional=True, default_value='dagster'),
+        'log_level': Field(str, is_required=False, default_value='INFO'),
+        'name': Field(str, is_required=False, default_value='dagster'),
     },
     description='A JSON-formatted console logger',
 )
