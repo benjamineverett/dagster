@@ -2,11 +2,16 @@ import pytest
 
 from dagster import (
     DagsterUnknownResourceError,
+    InputDefinition,
     ModeDefinition,
+    OutputDefinition,
     ResourceDefinition,
     RunConfig,
+    String,
+    as_dagster_type,
     composite_solid,
     execute_pipeline,
+    input_hydration_config,
     pipeline,
     resource,
     solid,
@@ -280,3 +285,86 @@ def test_execution_plan_subset_with_aliases():
 # TODO: Add test for resource mapping pending resolution of
 # https://github.com/dagster-io/dagster/issues/1950 and
 # https://github.com/dagster-io/dagster/issues/1949
+
+
+def test_custom_type_with_resource_dependendent_hydration():
+    def define_input_hydration_pipeline(should_require_resources):
+        @resource
+        def resource_a(_):
+            yield 'A'
+
+        class CustomType(str):
+            pass
+
+        @input_hydration_config(
+            String, required_resource_keys={'a'} if should_require_resources else set()
+        )
+        def InputHydration(context, hello):
+            assert context.resources.a == 'A'
+            return CustomType(hello)
+
+        CustomDagsterType = as_dagster_type(
+            CustomType, name='CustomType', input_hydration_config=InputHydration
+        )
+
+        @solid(input_defs=[InputDefinition('custom_type', CustomDagsterType)])
+        def input_hydration_solid(context, custom_type):
+            context.log.info(custom_type)
+
+        @pipeline(mode_defs=[ModeDefinition(resource_defs={'a': resource_a})])
+        def input_hydration_pipeline():
+            input_hydration_solid()
+
+        return input_hydration_pipeline
+
+    under_required_pipeline = define_input_hydration_pipeline(should_require_resources=False)
+    with pytest.raises(DagsterUnknownResourceError):
+        execute_pipeline(
+            under_required_pipeline,
+            {'solids': {'input_hydration_solid': {'inputs': {'custom_type': 'hello'}}}},
+        )
+
+    sufficiently_required_pipeline = define_input_hydration_pipeline(should_require_resources=True)
+    assert execute_pipeline(
+        sufficiently_required_pipeline,
+        {'solids': {'input_hydration_solid': {'inputs': {'custom_type': 'hello'}}}},
+    ).success
+
+
+@pytest.mark.skip(reason="not yet implemented")
+def test_resource_dependent_hydration_with_selective_init():
+    def get_resource_init_input_hydration_pipeline(resources_initted):
+        @resource
+        def resource_a(_):
+            resources_initted['a'] = True
+            yield 'A'
+
+        class CustomType(str):
+            pass
+
+        @input_hydration_config(String, required_resource_keys={'a'})
+        def InputHydration(context, hello):
+            assert context.resources.a == 'A'
+            return CustomType(hello)
+
+        CustomDagsterType = as_dagster_type(
+            CustomType, name='CustomType', input_hydration_config=InputHydration
+        )
+
+        @solid(input_defs=[InputDefinition('custom_type', CustomDagsterType)])
+        def input_hydration_solid(context, custom_type):
+            context.log.info(custom_type)
+
+        @solid(output_defs=[OutputDefinition(CustomDagsterType)])
+        def source_custom_type(_):
+            return CustomType('from solid')
+
+        @pipeline(mode_defs=[ModeDefinition(resource_defs={'a': resource_a})])
+        def selective_pipeline():
+            input_hydration_solid(source_custom_type())
+
+        return selective_pipeline
+
+    resources_initted = {}
+    assert execute_pipeline(get_resource_init_input_hydration_pipeline(resources_initted)).success
+    assert set(resources_initted.keys()) == {}

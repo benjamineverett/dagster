@@ -96,9 +96,16 @@ ContextCreationData = namedtuple(
 )
 
 
-def get_required_resource_keys_to_init(solid_defs, system_storage_def):
+def get_required_resource_keys_to_init(execution_plan, system_storage_def):
     resource_keys = set()
     resource_keys = resource_keys.union(system_storage_def.required_resource_keys)
+
+    solid_def_names = execution_plan.get_solid_def_name_set()
+    solid_defs = [
+        solid_def
+        for solid_def in execution_plan.pipeline_def.all_solid_defs
+        if solid_def.name in solid_def_names
+    ]
 
     for solid_def in solid_defs:
         resource_keys = resource_keys.union(solid_def.required_resource_keys)
@@ -107,7 +114,7 @@ def get_required_resource_keys_to_init(solid_defs, system_storage_def):
 
 
 def create_context_creation_data(
-    pipeline_def, environment_dict, pipeline_run, instance, solid_def_names_in_execution
+    pipeline_def, environment_dict, pipeline_run, instance, execution_plan
 ):
     environment_config = EnvironmentConfig.build(pipeline_def, environment_dict, pipeline_run)
 
@@ -127,12 +134,7 @@ def create_context_creation_data(
         executor_def=executor_def,
         instance=instance,
         resource_keys_to_init=get_required_resource_keys_to_init(
-            [
-                solid_def
-                for solid_def in pipeline_def.all_solid_defs
-                if solid_def.name in solid_def_names_in_execution
-            ],
-            system_storage_def,
+            execution_plan, system_storage_def,
         ),
     )
 
@@ -156,11 +158,7 @@ def scoped_pipeline_context(
     check.opt_inst_param(system_storage_data, 'system_storage_data', SystemStorageData)
 
     context_creation_data = create_context_creation_data(
-        pipeline_def,
-        environment_dict,
-        pipeline_run,
-        instance,
-        execution_plan.get_solid_def_name_set(),
+        pipeline_def, environment_dict, pipeline_run, instance, execution_plan,
     )
 
     # After this try block, a Dagster exception thrown will result in a pipeline init failure event.

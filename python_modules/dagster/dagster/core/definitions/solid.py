@@ -237,7 +237,15 @@ class SolidDefinition(ISolidDefinition):
 
     @property
     def required_resource_keys(self):
-        return self._required_resource_keys
+        resource_keys = set(self._required_resource_keys)
+        for runtime_type in self.all_runtime_types():
+            # TODO (prha): check to see which are coming from config
+            resource_keys = resource_keys.union(
+                runtime_type.input_hydration_config.required_resources_keys()
+                if runtime_type.input_hydration_config
+                else set()
+            )
+        return frozenset(resource_keys)
 
     @property
     def step_metadata_fn(self):
