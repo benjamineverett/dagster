@@ -237,25 +237,26 @@ def test_filesystem_event_log_storage_run_corrupted_bad_data():
             storage.get_logs_for_run('bar')
 
 
-@pytest.mark.skip  # https://github.com/dagster-io/dagster/issues/2098
 def test_concurrent_sqlite_event_log_connections():
     exceptions = multiprocessing.Queue()
 
     with seven.TemporaryDirectory() as tmpdir_path:
 
-        def cmd(exceptions):
+        def cmd(exceptions, thread_idx):
             storage = SqliteEventLogStorage(tmpdir_path)
             try:
+                print('Connecting... {thread_idx}'.format(thread_idx=thread_idx))
                 with storage.connect('foo'):
                     pass
             except Exception as exc:  # pylint: disable=broad-except
                 exceptions.put(exc)
+                print('thread index: {thread_idx}'.format(thread_idx=thread_idx))
                 exc_info = sys.exc_info()
                 traceback.print_tb(exc_info[2])
 
         ps = []
-        for _ in range(5):
-            ps.append(multiprocessing.Process(target=cmd, args=(exceptions,)))
+        for i in range(5):
+            ps.append(multiprocessing.Process(target=cmd, args=(exceptions, i)))
         for p in ps:
             p.start()
 
