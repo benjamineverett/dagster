@@ -184,21 +184,3 @@ def define_sleep_pipeline():
         no_sleep(no_sleep(no_sleep()))
 
     return seperate
-
-
-def test_seperate_sub_dags():
-    pipe = ExecutionTargetHandle.for_pipeline_python_file(
-        __file__, 'define_sleep_pipeline'
-    ).build_pipeline_definition()
-
-    result = execute_pipeline(
-        pipe,
-        environment_dict={'storage': {'filesystem': {}}, 'execution': {'multiprocess': {}}},
-        instance=DagsterInstance.local_temp(),
-    )
-
-    assert result.success
-    # ensure that
-    assert [
-        str(event.solid_handle) for event in result.step_event_list if event.is_step_success
-    ] == ['no_sleep', 'no_sleep_2', 'no_sleep_3', 'a_long_sleep']
