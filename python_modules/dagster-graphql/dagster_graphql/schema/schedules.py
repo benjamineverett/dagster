@@ -169,9 +169,9 @@ class DauphinRunningSchedule(dauphin.ObjectType):
         return len(attempt_files)
 
     def resolve_logs_path(self, graphene_info):
-        scheduler = graphene_info.context.get_scheduler()
+        instance = graphene_info.context.instance
         repository = graphene_info.context.get_repository()
-        return scheduler.log_path_for_schedule(repository.name, self._schedule.name)
+        return instance.log_path_for_schedule(repository.name, self._schedule.name)
 
     def resolve_runs(self, graphene_info, **kwargs):
         return [
@@ -213,9 +213,9 @@ class DauphinStartScheduleMutation(dauphin.Mutation):
 
     def mutate(self, graphene_info, schedule_name):
         repository = graphene_info.context.get_repository()
-        scheduler = graphene_info.context.get_scheduler()
+        instance = graphene_info.context.instance
 
-        schedule = scheduler.start_schedule(repository.name, schedule_name)
+        schedule = instance.start_schedule(repository.name, schedule_name)
 
         return graphene_info.schema.type_named('RunningScheduleResult')(
             schedule=graphene_info.schema.type_named('RunningSchedule')(
@@ -234,9 +234,9 @@ class DauphinStopRunningScheduleMutation(dauphin.Mutation):
     Output = dauphin.NonNull('RunningScheduleResult')
 
     def mutate(self, graphene_info, schedule_name):
-        scheduler = graphene_info.context.get_scheduler()
+        instance = graphene_info.context.instance
 
-        schedule = scheduler.stop_schedule(schedule_name)
+        schedule = instance.stop_schedule(schedule_name)
 
         return graphene_info.schema.type_named('RunningScheduleResult')(
             schedule=graphene_info.schema.type_named('RunningSchedule')(

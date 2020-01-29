@@ -1,9 +1,7 @@
-from dagster_cron import SystemCronScheduler
-
 from dagster import ScheduleDefinition, schedules
 
 
-@schedules(SystemCronScheduler)
+@schedules
 def gbfs_schedules():
     return [
         ScheduleDefinition(

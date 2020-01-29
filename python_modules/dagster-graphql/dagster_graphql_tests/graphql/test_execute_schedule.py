@@ -72,7 +72,7 @@ def test_basic_start_scheduled_execution_with_run_launcher():
         scheduler_handle.up(
             python_path=sys.executable,
             repository_path=file_relative_path(__file__, '../'),
-            schedule_storage=instance.schedule_storage,
+            instance=instance,
         )
 
         result = execute_dagster_graphql(

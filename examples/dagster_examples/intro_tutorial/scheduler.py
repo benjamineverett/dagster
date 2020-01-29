@@ -1,6 +1,5 @@
 import csv
 
-from dagster_cron import SystemCronScheduler
 
 from dagster import (
     RepositoryDefinition,
@@ -19,9 +18,7 @@ def hello_cereal(context):
     with open(dataset_path, 'r') as fd:
         cereals = [row for row in csv.DictReader(fd)]
 
-    context.log.info(
-        'Found {n_cereals} cereals'.format(n_cereals=len(cereals))
-    )
+    context.log.info('Found {n_cereals} cereals'.format(n_cereals=len(cereals)))
 
 
 @pipeline
@@ -30,12 +27,10 @@ def hello_cereal_pipeline():
 
 
 def cereal_repository():
-    return RepositoryDefinition(
-        'hello_cereal_repository', pipeline_defs=[hello_cereal_pipeline]
-    )
+    return RepositoryDefinition('hello_cereal_repository', pipeline_defs=[hello_cereal_pipeline])
 
 
-@schedules(SystemCronScheduler)
+@schedules
 def cereal_schedules():
     return [
         ScheduleDefinition(

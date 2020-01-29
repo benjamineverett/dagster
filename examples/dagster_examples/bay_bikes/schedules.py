@@ -1,8 +1,6 @@
 import os
 from datetime import datetime, timedelta
 
-from dagster_cron import SystemCronScheduler
-
 from dagster import daily_schedule, schedules
 
 RESOURCE_CREDENTIALS = ['DARK_SKY_API_KEY', 'GOOGLE_APPLICATION_CREDENTIALS']
@@ -41,6 +39,6 @@ def daily_ingest_schedule(date):
     }
 
 
-@schedules(scheduler=SystemCronScheduler)
+@schedules
 def define_scheduler():
     return [daily_ingest_schedule]

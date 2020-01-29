@@ -46,16 +46,11 @@ def test_get_all_schedules():
 
     # Initialize scheduler
     scheduler_handle = context.scheduler_handle
-    scheduler_handle.up(
-        python_path=sys.executable, repository_path="", schedule_storage=instance.schedule_storage
-    )
-
-    # Get scheduler
-    scheduler = scheduler_handle.get_scheduler(instance.schedule_storage)
+    scheduler_handle.up(python_path=sys.executable, repository_path="", instance=instance)
 
     # Start schedule
     repository = context.get_repository()
-    schedule = scheduler.start_schedule(repository.name, "no_config_pipeline_hourly_schedule")
+    schedule = instance.start_schedule(repository.name, "no_config_pipeline_hourly_schedule")
 
     # Query Scheduler + all Schedules
     scheduler_result = execute_dagster_graphql(context, GET_SCHEDULES_QUERY)
