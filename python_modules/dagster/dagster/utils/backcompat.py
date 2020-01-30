@@ -51,6 +51,7 @@ def canonicalize_backcompat_args(
             )
         return new_val
     if old_val is not None:
+        raise Exception('failme')
         warnings.warn(
             '"{old_arg}" is deprecated, use "{new_arg}" instead.'.format(
                 old_arg=old_arg, new_arg=new_arg
